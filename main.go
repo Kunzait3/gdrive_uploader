@@ -52,9 +52,9 @@ import (
 
 func createFile(service *drive.Service, name string, mimeType string, content io.Reader, parentId string) (*drive.File, error) {
 	f := &drive.File{
-		MimeType: mimeType,
-		Name:     name,
-		Parents:  []string{parentId},
+		MimeType:                     mimeType,
+		Name:                         name,
+		Parents:                      []string{parentId},
 		CopyRequiresWriterPermission: false,
 	}
 	file, err := service.Files.Create(f).Media(content).Do()
@@ -76,37 +76,37 @@ func uploadFile() {
 	if err != nil {
 		panic(fmt.Sprintf("cannot open file: %v", err))
 	}
-	
+
 	defer f.Close()
-	
+
 	// Step 2: Get the Google Drive service
 	srv, err := drive.NewService(context.Background())
 	if err != nil {
 		log.Fatalf("Unable to retrieve drive Client %v", err)
 	}
-	
+
 	// // Step 3: Create directory
 	// dir, err := createFolder(srv, "New Folder", "root")
-	
+
 	// if err != nil {
 	// 	panic(fmt.Sprintf("Could not create dir: %v\n", err))
 	// }
-	
+
 	//give your folder id here in which you want to upload or create new directory
 	folderId := "root"
-	
+
 	// Step 4: create the file and upload
 	file, err := createFile(srv, f.Name(), "application/octet-stream", f, folderId)
 	if err != nil {
 		panic(fmt.Sprintf("Could not create file: %v\n", err))
 	}
-	
+
 	// Make the file publicly accessible
 	permission := &drive.Permission{
-		Type: "anyone",   // Public access
-		Role: "reader",   // Read-only access
+		Type: "anyone", // Public access
+		Role: "reader", // Read-only access
 	}
-	
+
 	_, err = srv.Permissions.Create(file.Id, permission).Do()
 	if err != nil {
 		log.Fatalf("Unable to change file permission: %v", err)
@@ -132,10 +132,10 @@ func getListFile() {
 	if len(r.Files) == 0 {
 		fmt.Println("No files found.")
 	} else {
-	for _, i := range r.Files {
-		fmt.Printf("%s (%s) (%s)\n", i.Name, i.Id, i.WebContentLink)
+		for _, i := range r.Files {
+			fmt.Printf("%s (%s) (%s)\n", i.Name, i.Id, i.WebContentLink)
+		}
 	}
-}
 
 }
 
