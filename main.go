@@ -2,41 +2,36 @@ package main
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"log"
-	"net/http"
 	"os"
 
-	"golang.org/x/oauth2/google"
-	"golang.org/x/oauth2/jwt"
 	"google.golang.org/api/drive/v3"
-	"google.golang.org/api/option"
 )
 
 //Use Service account
-func ServiceAccount(secretFile string) *http.Client {
-	b, err := os.ReadFile(secretFile)
-	if err != nil {
-		log.Fatal("error while reading the credential file", err)
-	}
-	var s = struct {
-		Email      string `json:"client_email"`
-		PrivateKey string `json:"private_key"`
-	}{}
-	json.Unmarshal(b, &s)
-	config := &jwt.Config{
-		Email:      s.Email,
-		PrivateKey: []byte(s.PrivateKey),
-		Scopes: []string{
-			drive.DriveScope,
-		},
-		TokenURL: google.JWTTokenURL,
-	}
-	client := config.Client(context.Background())
-	return client
-}
+// func ServiceAccount(secretFile string) *http.Client {
+// 	b, err := os.ReadFile(secretFile)
+// 	if err != nil {
+// 		log.Fatal("error while reading the credential file", err)
+// 	}
+// 	var s = struct {
+// 		Email      string `json:"client_email"`
+// 		PrivateKey string `json:"private_key"`
+// 	}{}
+// 	json.Unmarshal(b, &s)
+// 	config := &jwt.Config{
+// 		Email:      s.Email,
+// 		PrivateKey: []byte(s.PrivateKey),
+// 		Scopes: []string{
+// 			drive.DriveScope,
+// 		},
+// 		TokenURL: google.JWTTokenURL,
+// 	}
+// 	client := config.Client(context.Background())
+// 	return client
+// }
 
 // func createFolder(service *drive.Service, name string, parentId string) (*drive.File, error) {
 // 	d := &drive.File{
@@ -85,9 +80,7 @@ func uploadFile() {
 	defer f.Close()
 	
 	// Step 2: Get the Google Drive service
-	client := ServiceAccount("credentials.json")
-
-	srv, err := drive.NewService(context.Background(), option.WithHTTPClient(client))
+	srv, err := drive.NewService(context.Background())
 	if err != nil {
 		log.Fatalf("Unable to retrieve drive Client %v", err)
 	}
@@ -124,9 +117,7 @@ func uploadFile() {
 }
 
 func getListFile() {
-	client := ServiceAccount("credentials.json")
-
-	srv, err := drive.NewService(context.Background(), option.WithHTTPClient(client))
+	srv, err := drive.NewService(context.Background())
 	if err != nil {
 		log.Fatalf("Unable to retrieve drive Client %v", err)
 	}
