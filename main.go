@@ -1,11 +1,14 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
 	"log"
-	"os"
+	// "os"
+
+	"encoding/csv"
 
 	"google.golang.org/api/drive/v3"
 )
@@ -68,16 +71,33 @@ func createFile(service *drive.Service, name string, mimeType string, content io
 }
 
 func uploadFile() {
-	// Step 1: Open  file
-	f, err := os.Open("file/test.txt")
+	// // Step 1: Open  file
+	// f, err := os.Open("file/test.txt")
 
-	// fmt.Println(f.Name())
+	// if err != nil {
+	// 	panic(fmt.Sprintf("cannot open file: %v", err))
+	// }
 
+	// defer f.Close()
+
+	// Create CSV file
+	b := &bytes.Buffer{}
+	csvWriter := csv.NewWriter(b)
+	err := csvWriter.Write([]string{"test1","test2","test4"})
 	if err != nil {
-		panic(fmt.Sprintf("cannot open file: %v", err))
+		log.Fatalf("Unable to write csv %v", err)
 	}
 
-	defer f.Close()
+	err = csvWriter.Write([]string{"asd","dsa","sda"})
+	if err != nil {
+		log.Fatalf("Unable to write csv %v", err)
+	}
+
+	csvWriter.Flush()
+	err = csvWriter.Error()
+	if err != nil {
+		log.Fatalf("Unable to flush csv %v", err)
+	}
 
 	// Step 2: Get the Google Drive service
 	srv, err := drive.NewService(context.Background())
@@ -96,7 +116,7 @@ func uploadFile() {
 	folderId := "root"
 
 	// Step 4: create the file and upload
-	file, err := createFile(srv, f.Name(), "application/octet-stream", f, folderId)
+	file, err := createFile(srv, "testCsv.csv", "text/csv", b, folderId) //you can omit MimeType, Google Drive will auto assigned it
 	if err != nil {
 		panic(fmt.Sprintf("Could not create file: %v\n", err))
 	}
@@ -139,8 +159,42 @@ func getListFile() {
 
 }
 
+func getFile(fileId string) {
+	srv, err := drive.NewService(context.Background())
+	if err != nil {
+		log.Fatalf("Unable to retrieve drive Client %v", err)
+	}
+
+	r, err := srv.Files.Get(fileId).Fields("id, name, webContentLink").Do()
+	if err != nil {
+		log.Fatalf("Unable to retrieve files: %v", err)
+	}
+
+	fmt.Println("Files:")
+	fmt.Println("Name: " + r.Name)
+	fmt.Println("Link: " + r.WebContentLink)
+}
+
+func deleteFile(fileId string) {
+	srv, err := drive.NewService(context.Background())
+	if err != nil {
+		log.Fatalf("Unable to retrieve drive Client %v", err)
+	}
+
+	err = srv.Files.Delete(fileId).Do()
+	if err != nil {
+		log.Fatalf("Unable to retrieve files: %v", err)
+	}
+
+	fmt.Println("Delete Success")
+}
+
 func main() {
-	uploadFile()
+	// uploadFile()
 
 	getListFile()
+
+	// getFile("fileId")
+
+	// deleteFile("fileId")
 }
