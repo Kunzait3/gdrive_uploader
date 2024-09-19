@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+
 	// "os"
 
 	"encoding/csv"
@@ -83,12 +84,12 @@ func uploadFile() {
 	// Create CSV file
 	b := &bytes.Buffer{}
 	csvWriter := csv.NewWriter(b)
-	err := csvWriter.Write([]string{"test1","test2","test4"})
+	err := csvWriter.Write([]string{"test1", "test2", "test4"})
 	if err != nil {
 		log.Fatalf("Unable to write csv %v", err)
 	}
 
-	err = csvWriter.Write([]string{"asd","dsa","sda"})
+	err = csvWriter.Write([]string{"asd", "dsa", "sda"})
 	if err != nil {
 		log.Fatalf("Unable to write csv %v", err)
 	}
